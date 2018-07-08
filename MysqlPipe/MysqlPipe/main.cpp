@@ -8,7 +8,8 @@ void invoke(string exe);
 
 int main(int argc, char* argv[])
 {
-	string exe = "hello.exe";
+	string exe = "C:\\Users\\DALAOCHEN\\Desktop\\mysql-5.7.10\\bld\\client\\Debug\\mysql.exe -uroot -proot";
+	//string exe = "hello.exe";
 	invoke(exe);
 	return 0;
 }
@@ -43,14 +44,18 @@ void invoke(string exe)
 	si.dwFlags = STARTF_USESTDHANDLES;
 	si.cb = sizeof(si);
 
-	if (CreateProcess(NULL, (char *)exe.c_str(), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+	if (CreateProcess(NULL, (char *)exe.c_str(), NULL, NULL, 1, 0, NULL, NULL, &si, &pi))
 	{
 		CloseHandle(pi.hThread);
-		const int max = 20;
+		const int max = 20*1024;
 		char buf[max] = { 0 };
 		DWORD dw;
-		ReadFile(hOutReadPipe, buf, max - 1, &dw, NULL);
-		cout << buf << endl;
+		//ReadFile(hOutReadPipe, buf, max - 1, &dw, NULL);
+		//cout << buf << endl;
+		WriteFile(hInWritePipe, "show databases;\n", strlen("show databases;\n"), &dw, NULL);
+		//WriteFile(hInWritePipe, "quit\n", strlen("quit\n"), &dw, NULL);
+		while(ReadFile(hOutReadPipe, buf, max - 1, &dw, NULL))
+			cout << buf << endl;
 		CloseHandle(pi.hProcess);
 	}
 
